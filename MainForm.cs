@@ -9,18 +9,10 @@ namespace LBXManager
 {
 	public partial class MainForm : Form
 	{
-		private class FileClass
-		{
-			public uint startPos;
-			public uint endPos;
-			public string fileName;
-			public string comment;
-		}
-
 		private byte[] lbxFile;
 		private int fileCount;
 		private short fileType;
-		private FileClass[] files;
+		private InternalFileClass[] files;
 		private static bool[] lookup;
 		private byte[] externalPalette;
 		private int internalPaletteOffset;
@@ -144,10 +136,10 @@ namespace LBXManager
 		private void LoadFiles()
 		{
 			fileList.Items.Clear();
-			files = new FileClass[fileCount];
+			files = new InternalFileClass[fileCount];
 			for (int i = 0; i < fileCount; i++)
 			{
-				FileClass newFile = new FileClass();
+				InternalFileClass newFile = new InternalFileClass();
 				if (fileType == 0)
 				{
 					char[] name = new char[8];
@@ -181,7 +173,7 @@ namespace LBXManager
 		{
 			try
 			{
-				FileClass file = files[fileList.SelectedIndex];
+				InternalFileClass file = files[fileList.SelectedIndex];
 				int length = (int)(file.endPos - file.startPos);
 				if (fileType == 0)
 				{
@@ -204,7 +196,7 @@ namespace LBXManager
 			}
 		}
 
-		private void TryLoadImage(FileClass file)
+		private void TryLoadImage(InternalFileClass file)
 		{
 			//This is relative to file.startPos, in the format of "Starting Index, count of bytes"
 			//0, 2 is image width
@@ -446,7 +438,7 @@ namespace LBXManager
 							FileInfo fi = new FileInfo(lbxFilePathTextBox.Text);
 							baseWriter.WriteLine("LBXName:" + fi.Name);
 							baseWriter.WriteLine("NumOfFiles:" + files.Length);
-							foreach (FileClass file in files)
+							foreach (InternalFileClass file in files)
 							{
 								baseWriter.WriteLine("FileName:" + file.fileName + " Comment:" + file.comment);
 								TryLoadImage(file);
