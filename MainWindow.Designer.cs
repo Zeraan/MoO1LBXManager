@@ -29,26 +29,26 @@
 		private void InitializeComponent()
 		{
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.lbxDirectoryPathTextBox = new System.Windows.Forms.TextBox();
 			this.openDirectoryButton = new System.Windows.Forms.Button();
+			this.lbxDirectoryPathTextBox = new System.Windows.Forms.TextBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.lbxFilesTreeView = new System.Windows.Forms.TreeView();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.pictureBox1 = new System.Windows.Forms.PictureBox();
+			this.exportImagesButton = new System.Windows.Forms.Button();
+			this.framesBar = new System.Windows.Forms.TrackBar();
+			this.label5 = new System.Windows.Forms.Label();
 			this.frameLabel = new System.Windows.Forms.Label();
 			this.heightLabel = new System.Windows.Forms.Label();
 			this.widthLabel = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
-			this.framesBar = new System.Windows.Forms.TrackBar();
-			this.exportImagesButton = new System.Windows.Forms.Button();
+			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.textPreviewTextBox = new System.Windows.Forms.TextBox();
 			this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.framesBar)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.groupBox4.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -63,16 +63,6 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Game Directory";
 			// 
-			// lbxDirectoryPathTextBox
-			// 
-			this.lbxDirectoryPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.lbxDirectoryPathTextBox.Location = new System.Drawing.Point(7, 20);
-			this.lbxDirectoryPathTextBox.Name = "lbxDirectoryPathTextBox";
-			this.lbxDirectoryPathTextBox.ReadOnly = true;
-			this.lbxDirectoryPathTextBox.Size = new System.Drawing.Size(801, 20);
-			this.lbxDirectoryPathTextBox.TabIndex = 0;
-			// 
 			// openDirectoryButton
 			// 
 			this.openDirectoryButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -83,6 +73,16 @@
 			this.openDirectoryButton.Text = "Open Game Directory";
 			this.openDirectoryButton.UseVisualStyleBackColor = true;
 			this.openDirectoryButton.Click += new System.EventHandler(this.openDirectoryButton_Click);
+			// 
+			// lbxDirectoryPathTextBox
+			// 
+			this.lbxDirectoryPathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.lbxDirectoryPathTextBox.Location = new System.Drawing.Point(7, 20);
+			this.lbxDirectoryPathTextBox.Name = "lbxDirectoryPathTextBox";
+			this.lbxDirectoryPathTextBox.ReadOnly = true;
+			this.lbxDirectoryPathTextBox.Size = new System.Drawing.Size(801, 20);
+			this.lbxDirectoryPathTextBox.TabIndex = 0;
 			// 
 			// groupBox2
 			// 
@@ -103,6 +103,7 @@
 			this.lbxFilesTreeView.Name = "lbxFilesTreeView";
 			this.lbxFilesTreeView.Size = new System.Drawing.Size(330, 484);
 			this.lbxFilesTreeView.TabIndex = 0;
+			this.lbxFilesTreeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.lbxFilesTreeView_NodeMouseClick);
 			// 
 			// groupBox3
 			// 
@@ -120,13 +121,33 @@
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Image Preview";
 			// 
-			// pictureBox1
+			// exportImagesButton
 			// 
-			this.pictureBox1.Location = new System.Drawing.Point(7, 20);
-			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(320, 240);
-			this.pictureBox1.TabIndex = 0;
-			this.pictureBox1.TabStop = false;
+			this.exportImagesButton.Enabled = false;
+			this.exportImagesButton.Location = new System.Drawing.Point(327, 284);
+			this.exportImagesButton.Name = "exportImagesButton";
+			this.exportImagesButton.Size = new System.Drawing.Size(131, 23);
+			this.exportImagesButton.TabIndex = 11;
+			this.exportImagesButton.Text = "Export Image";
+			this.exportImagesButton.UseVisualStyleBackColor = true;
+			this.exportImagesButton.Click += new System.EventHandler(this.exportImagesButton_Click);
+			// 
+			// framesBar
+			// 
+			this.framesBar.Enabled = false;
+			this.framesBar.Location = new System.Drawing.Point(77, 284);
+			this.framesBar.Name = "framesBar";
+			this.framesBar.Size = new System.Drawing.Size(250, 45);
+			this.framesBar.TabIndex = 25;
+			// 
+			// label5
+			// 
+			this.label5.AutoSize = true;
+			this.label5.Location = new System.Drawing.Point(6, 284);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(65, 13);
+			this.label5.TabIndex = 24;
+			this.label5.Text = "Frame Index";
 			// 
 			// frameLabel
 			// 
@@ -155,33 +176,13 @@
 			this.widthLabel.TabIndex = 21;
 			this.widthLabel.Text = "Width:";
 			// 
-			// label5
+			// pictureBox1
 			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(6, 284);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(65, 13);
-			this.label5.TabIndex = 24;
-			this.label5.Text = "Frame Index";
-			// 
-			// framesBar
-			// 
-			this.framesBar.Enabled = false;
-			this.framesBar.Location = new System.Drawing.Point(77, 284);
-			this.framesBar.Name = "framesBar";
-			this.framesBar.Size = new System.Drawing.Size(250, 45);
-			this.framesBar.TabIndex = 25;
-			// 
-			// exportImagesButton
-			// 
-			this.exportImagesButton.Enabled = false;
-			this.exportImagesButton.Location = new System.Drawing.Point(327, 284);
-			this.exportImagesButton.Name = "exportImagesButton";
-			this.exportImagesButton.Size = new System.Drawing.Size(131, 23);
-			this.exportImagesButton.TabIndex = 11;
-			this.exportImagesButton.Text = "Export Images";
-			this.exportImagesButton.UseVisualStyleBackColor = true;
-			this.exportImagesButton.Click += new System.EventHandler(this.exportImagesButton_Click);
+			this.pictureBox1.Location = new System.Drawing.Point(7, 20);
+			this.pictureBox1.Name = "pictureBox1";
+			this.pictureBox1.Size = new System.Drawing.Size(320, 240);
+			this.pictureBox1.TabIndex = 0;
+			this.pictureBox1.TabStop = false;
 			// 
 			// groupBox4
 			// 
@@ -218,8 +219,8 @@
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox3.ResumeLayout(false);
 			this.groupBox3.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.framesBar)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.groupBox4.ResumeLayout(false);
 			this.groupBox4.PerformLayout();
 			this.ResumeLayout(false);
