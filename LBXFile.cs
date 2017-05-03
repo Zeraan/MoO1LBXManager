@@ -15,7 +15,7 @@ namespace LBXManager
 
 		private int numOfInternalFiles;
 		List<InternalFileClass> internalFiles;
-		private byte[] lbxFile;
+		private byte[] bytes;
 
 		public const uint FirstPower = 256;
 		public const uint SecondPower = 65536;
@@ -23,8 +23,17 @@ namespace LBXManager
 
 		#region Properties
 		public List<InternalFileClass> InternalFiles => internalFiles;
+
+		public byte[] Bytes => bytes;
+
+		public static byte[] ExternalPalette => externalPalette;
+
+		public static bool[] Lookup => lookup;
 		#endregion
 
+		/// <summary>
+		/// Constructor that has sole purpose of making sure the static properties are initialized
+		/// </summary>
 		public LBXFile()
 		{
 			if (lookup == null)
@@ -56,13 +65,19 @@ namespace LBXManager
 			lookup[' '] = true;
 		}
 
+		/// <summary>
+		/// Load in LBX file from file system
+		/// </summary>
+		/// <param name="fileToLoad">The file to load</param>
+		/// <param name="reason">Reason for failure, if any</param>
+		/// <returns>True if successful, false otherwise</returns>
 		public bool LoadLBXFile(FileInfo fileToLoad, out string reason)
 		{
 			try
 			{
 				using (FileStream fileStream = new FileStream(fileToLoad.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
 				{
-					lbxFile = ReadFile(fileStream);
+					bytes = ReadFile(fileStream);
 				}
 				if (!ParseMiniHeader())
 				{
@@ -128,13 +143,22 @@ namespace LBXManager
 			return true;
 		}
 
+		public string GetText()
+		{
+			if (internalFiles != null && internalFiles.Count > 0)
+			{
+				return internalFiles[0].GetText(this);
+			}
+			return string.Empty;
+		}
+
 		/// <summary>
 		/// Checks if the LBX file has valid markers
 		/// </summary>
 		/// <returns>True if valid, false otherwise</returns>
 		private bool sigCheck()
 		{
-			if (lbxFile[2] == 0xAD && lbxFile[3] == 0xFE && lbxFile[4] == 0 && lbxFile[5] == 0)
+			if (bytes[2] == 0xAD && bytes[3] == 0xFE && bytes[4] == 0 && bytes[5] == 0)
 			{
 				return true;
 			}
@@ -147,16 +171,16 @@ namespace LBXManager
 		/// <returns></returns>
 		private bool ParseMiniHeader()
 		{
-			if (lbxFile == null || lbxFile.Length < 8)
+			if (bytes == null || bytes.Length < 8)
 			{
 				return false;
 			}
-			numOfInternalFiles = (short)(lbxFile[1] * 256 + lbxFile[0]);
+			numOfInternalFiles = (short)(bytes[1] * 256 + bytes[0]);
 			if (!sigCheck())
 			{
 				return false;
 			}
-			var fileType = (short)(lbxFile[7] * 256 + lbxFile[6]);
+			var fileType = (short)(bytes[7] * 256 + bytes[6]);
 			switch (fileType)
 			{
 				case 0: LBXFileType = LBXFileTypeEnum.IMAGE;
@@ -185,25 +209,25 @@ namespace LBXManager
 					char[] comment = new char[24];
 					for (int k = 0; k < 8; k++)
 					{
-						name[k] = lookup[(char)lbxFile[512 + (i * 32) + k]] ? (char)lbxFile[512 + (i * 32) + k] : ' ';
+						name[k] = lookup[(char)bytes[512 + (i * 32) + k]] ? (char)bytes[512 + (i * 32) + k] : ' ';
 					}
 					for (int k = 0; k < 24; k++)
 					{
-						comment[k] = lookup[(char)lbxFile[520 + (i * 32) + k]] ? (char)lbxFile[520 + (i * 32) + k] : ' ';
+						comment[k] = lookup[(char)bytes[520 + (i * 32) + k]] ? (char)bytes[520 + (i * 32) + k] : ' ';
 					}
-					newFile.comment = new string(comment);
-					newFile.fileName = new string(name);
+					newFile.Comment = new string(comment);
+					newFile.FileName = new string(name);
 				}
 				else
 				{
-					newFile.fileName = "File " + (i + 1);
+					newFile.FileName = "File " + (i + 1);
 				}
 				int currentPos = 8 + (i * 4);
 				//Unsigned integers are stored backwards (4 bytes per integer), so read from left to right, while multiplying each byte's value by 256^i, with i starting at 0, to get the real value
-				newFile.startPos = lbxFile[currentPos + 0] + (uint)(lbxFile[currentPos + 1] * FirstPower) + (uint)(lbxFile[currentPos + 2] * SecondPower) +
-								   (uint)(lbxFile[currentPos + 3] * ThirdPower);
-				newFile.endPos = lbxFile[currentPos + 4] + (uint)(lbxFile[currentPos + 5] * FirstPower) + (uint)(lbxFile[currentPos + 6] * SecondPower) +
-								   (uint)(lbxFile[currentPos + 7] * ThirdPower);
+				newFile.StartPos = bytes[currentPos + 0] + (uint)(bytes[currentPos + 1] * FirstPower) + (uint)(bytes[currentPos + 2] * SecondPower) +
+								   (uint)(bytes[currentPos + 3] * ThirdPower);
+				newFile.EndPos = bytes[currentPos + 4] + (uint)(bytes[currentPos + 5] * FirstPower) + (uint)(bytes[currentPos + 6] * SecondPower) +
+								   (uint)(bytes[currentPos + 7] * ThirdPower);
 
 				internalFiles.Add(newFile);
 			}

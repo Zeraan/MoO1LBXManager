@@ -139,6 +139,7 @@
 			this.framesBar.Name = "framesBar";
 			this.framesBar.Size = new System.Drawing.Size(250, 45);
 			this.framesBar.TabIndex = 25;
+			this.framesBar.ValueChanged += new System.EventHandler(this.framesBar_ValueChanged);
 			// 
 			// label5
 			// 
@@ -200,6 +201,7 @@
 			this.textPreviewTextBox.Multiline = true;
 			this.textPreviewTextBox.Name = "textPreviewTextBox";
 			this.textPreviewTextBox.ReadOnly = true;
+			this.textPreviewTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textPreviewTextBox.Size = new System.Drawing.Size(451, 151);
 			this.textPreviewTextBox.TabIndex = 0;
 			// 

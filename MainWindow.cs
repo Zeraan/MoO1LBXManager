@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
@@ -7,6 +8,8 @@ namespace LBXManager
 {
 	public partial class MainWindow : Form
 	{
+		private Bitmap[] currentBitmaps;
+
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -44,7 +47,7 @@ namespace LBXManager
 					{
 						foreach (var internalFile in lbxFile.InternalFiles)
 						{
-							var internalNode = new TreeNode(internalFile.fileName + " " + internalFile.comment);
+							var internalNode = new TreeNode(internalFile.FileName + " " + internalFile.Comment);
 							internalNode.Tag = internalFile;
 							treeNode.Nodes.Add(internalNode);
 						}
@@ -77,12 +80,46 @@ namespace LBXManager
 
 		private void LoadTextFromLBXFile(LBXFile lbxFile)
 		{
+			framesBar.Enabled = false;
+			framesBar.SetRange(0, 1);
+			framesBar.Value = 0;
 
+			pictureBox1.Image = null;
+			pictureBox1.Refresh();
+
+			currentBitmaps = null;
+
+			exportImagesButton.Enabled = false;
+
+			textPreviewTextBox.Text = lbxFile.GetText();
 		}
 
 		private void LoadImageFromLBXFile(LBXFile lbxFile, InternalFileClass internalFile)
 		{
+			currentBitmaps = internalFile.GetBitmaps(lbxFile);
 
+			if (currentBitmaps.Length > 1)
+			{
+				framesBar.Enabled = true;
+				framesBar.SetRange(0, currentBitmaps.Length - 1);
+			}
+			else
+			{
+				framesBar.Enabled = false;
+				framesBar.SetRange(0, 1);
+			}
+			framesBar.Value = 0;
+
+			widthLabel.Text = "Width: " + internalFile.Width;
+			heightLabel.Text = "Height: " + internalFile.Height;
+			frameLabel.Text = "Frames: " + internalFile.Frames;
+
+			pictureBox1.Image = currentBitmaps[0];
+			pictureBox1.Refresh();
+
+			exportImagesButton.Enabled = true;
+
+			textPreviewTextBox.Text = string.Empty;
 		}
 		#endregion
 
@@ -100,7 +137,30 @@ namespace LBXManager
 
 		private void exportImagesButton_Click(object sender, EventArgs e)
 		{
+			if (currentBitmaps == null) //Sanity check
+			{
+				return;
+			}
+			using (FolderBrowserDialog folderBrowser = new FolderBrowserDialog())
+			{
+				if (folderBrowser.ShowDialog() == DialogResult.OK)
+				{
+					try
+					{
+						var selectedNode = lbxFilesTreeView.SelectedNode;
+						InternalFileClass internalFile = selectedNode.Tag as InternalFileClass;
 
+						for (int i = 0; i < currentBitmaps.Length; i++)
+						{
+							currentBitmaps[i].Save(Path.Combine(folderBrowser.SelectedPath, internalFile.FileName + i + ".BMP"));
+						}
+					}
+					catch (Exception exception)
+					{
+						MessageBox.Show(exception.Message);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -138,6 +198,12 @@ namespace LBXManager
 				LBXFile lbxFile = selectedNode.Tag as LBXFile;
 				LoadTextFromLBXFile(lbxFile);
 			}
+		}
+
+		private void framesBar_ValueChanged(object sender, EventArgs e)
+		{
+			pictureBox1.Image = currentBitmaps[framesBar.Value];
+			pictureBox1.Refresh();
 		}
 		#endregion
 	}

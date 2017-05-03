@@ -152,19 +152,19 @@ namespace LBXManager
 					{
 						comment[k] = lookup[(char) lbxFile[520 + (i*32) + k]] ? (char) lbxFile[520 + (i*32) + k] : ' ';
 					}
-					newFile.comment = new string(comment);
-					newFile.fileName = new string(name);
+					newFile.Comment = new string(comment);
+					newFile.FileName = new string(name);
 				}
 				else
 				{
-					newFile.fileName = "File " + (i + 1);
+					newFile.FileName = "File " + (i + 1);
 				}
 				int currentPos = 8 + (i*4);
-				newFile.startPos = lbxFile[currentPos + 0] + (uint)(lbxFile[currentPos + 1] * 256) + (uint)(lbxFile[currentPos + 2] * 65536) +
+				newFile.StartPos = lbxFile[currentPos + 0] + (uint)(lbxFile[currentPos + 1] * 256) + (uint)(lbxFile[currentPos + 2] * 65536) +
 								   (uint)(lbxFile[currentPos + 3] * 16777216);
-				newFile.endPos = lbxFile[currentPos + 4] + (uint)(lbxFile[currentPos + 5] * 256) + (uint)(lbxFile[currentPos + 6] * 65536) +
+				newFile.EndPos = lbxFile[currentPos + 4] + (uint)(lbxFile[currentPos + 5] * 256) + (uint)(lbxFile[currentPos + 6] * 65536) +
 								   (uint)(lbxFile[currentPos + 7] * 16777216);
-				fileList.Items.Add(newFile.fileName + " " + newFile.comment);
+				fileList.Items.Add(newFile.FileName + " " + newFile.Comment);
 				files[i] = newFile;
 			}
 		}
@@ -174,7 +174,7 @@ namespace LBXManager
 			try
 			{
 				InternalFileClass file = files[fileList.SelectedIndex];
-				int length = (int)(file.endPos - file.startPos);
+				int length = (int)(file.EndPos - file.StartPos);
 				if (fileType == 0)
 				{
 					TryLoadImage(file);
@@ -182,9 +182,9 @@ namespace LBXManager
 				else if (fileType == 5)
 				{
 					char[] letters = new char[length];
-					for (uint i = file.startPos; i < file.endPos; i++)
+					for (uint i = file.StartPos; i < file.EndPos; i++)
 					{
-						letters[i - file.startPos] = lookup[lbxFile[i]] ? (char) lbxFile[i] : '-';
+						letters[i - file.StartPos] = lookup[lbxFile[i]] ? (char) lbxFile[i] : '-';
 					}
 					string text = new string(letters);
 					textBox2.Text = text;
@@ -214,10 +214,10 @@ namespace LBXManager
 			//Pixel data starts at file.startPos + frameOffsetX + 4
 			//Read pixel data (each pixel have a value between 0 - 255), so 1 byte per pixel.  If number of pixels is odd value, discard the 2nd byte after each pixel
 			//Read the image header
-			int width = lbxFile[file.startPos] + (lbxFile[file.startPos + 1]*256);
-			int height = lbxFile[file.startPos + 2] + (lbxFile[file.startPos + 3]*256);
-			int frames = lbxFile[file.startPos + 6] + (lbxFile[file.startPos + 7]*256);
-			frameDelay = lbxFile[file.startPos + 8] + (lbxFile[file.startPos + 9] * 256);
+			int width = lbxFile[file.StartPos] + (lbxFile[file.StartPos + 1]*256);
+			int height = lbxFile[file.StartPos + 2] + (lbxFile[file.StartPos + 3]*256);
+			int frames = lbxFile[file.StartPos + 6] + (lbxFile[file.StartPos + 7]*256);
+			frameDelay = lbxFile[file.StartPos + 8] + (lbxFile[file.StartPos + 9] * 256);
 			widthLabel.Text = "Width: " + width;
 			heightLabel.Text = "Height: " + height;
 			frameLabel.Text = "Frames: " + frames;
@@ -234,31 +234,31 @@ namespace LBXManager
 			{
 				framesBar.Enabled = false;
 			}
-			int colorPaletteOffsetStart = lbxFile[file.startPos + 14] + lbxFile[file.startPos + 15]*256;
+			int colorPaletteOffsetStart = lbxFile[file.StartPos + 14] + lbxFile[file.StartPos + 15]*256;
 
 			uint[] frameOffsets = new uint[frames + 1];
 
 			for (int i = 0; i < frameOffsets.Length; i++)
 			{
-				frameOffsets[i] = lbxFile[file.startPos + 18 + (i*4)] +
-				                  lbxFile[file.startPos + 18 + (i*4) + 1]*256U +
-				                  lbxFile[file.startPos + 18 + (i*4) + 2]*65536U +
-				                  lbxFile[file.startPos + 18 + (i*4) + 3]*16777216U;
+				frameOffsets[i] = lbxFile[file.StartPos + 18 + (i*4)] +
+				                  lbxFile[file.StartPos + 18 + (i*4) + 1]*256U +
+				                  lbxFile[file.StartPos + 18 + (i*4) + 2]*65536U +
+				                  lbxFile[file.StartPos + 18 + (i*4) + 3]*16777216U;
 			}
 			numOfInternalColors = 0;
 			internalPalette = new byte[0];
 			if (colorPaletteOffsetStart > 0)
 			{
-				uint colorOffset = lbxFile[file.startPos + colorPaletteOffsetStart] +
-				                   lbxFile[file.startPos + colorPaletteOffsetStart + 1]*256U;
-				internalPaletteOffset = lbxFile[file.startPos + colorPaletteOffsetStart + 2] +
-							    lbxFile[file.startPos + colorPaletteOffsetStart + 3] * 256;
-				numOfInternalColors = lbxFile[file.startPos + colorPaletteOffsetStart + 4] +
-				              lbxFile[file.startPos + colorPaletteOffsetStart + 5]*256;
+				uint colorOffset = lbxFile[file.StartPos + colorPaletteOffsetStart] +
+				                   lbxFile[file.StartPos + colorPaletteOffsetStart + 1]*256U;
+				internalPaletteOffset = lbxFile[file.StartPos + colorPaletteOffsetStart + 2] +
+							    lbxFile[file.StartPos + colorPaletteOffsetStart + 3] * 256;
+				numOfInternalColors = lbxFile[file.StartPos + colorPaletteOffsetStart + 4] +
+				              lbxFile[file.StartPos + colorPaletteOffsetStart + 5]*256;
 				internalPalette = new byte[numOfInternalColors * 3];
 				for (int i = 0; i < (numOfInternalColors * 3); i++)
 				{
-					internalPalette[i] = lbxFile[file.startPos + colorOffset + i];
+					internalPalette[i] = lbxFile[file.StartPos + colorOffset + i];
 				}
 			}
 
@@ -304,8 +304,8 @@ namespace LBXManager
 				}
 				
 				//Load in the image
-				uint BitmapStart = frameOffsets[i] + file.startPos;
-				uint BitmapEnd = frameOffsets[i + 1] + file.startPos;
+				uint BitmapStart = frameOffsets[i] + file.StartPos;
+				uint BitmapEnd = frameOffsets[i + 1] + file.StartPos;
 				uint BitmapSize = BitmapEnd - BitmapStart;
 
 				uint BitmapIndex = BitmapStart + 1;
@@ -440,10 +440,10 @@ namespace LBXManager
 							baseWriter.WriteLine("NumOfFiles:" + files.Length);
 							foreach (InternalFileClass file in files)
 							{
-								baseWriter.WriteLine("FileName:" + file.fileName + " Comment:" + file.comment);
+								baseWriter.WriteLine("FileName:" + file.FileName + " Comment:" + file.Comment);
 								TryLoadImage(file);
 								using (
-									TextWriter writer = new StreamWriter(Path.Combine(folderBrowser.SelectedPath, file.fileName + "HDR.TXT"), false)
+									TextWriter writer = new StreamWriter(Path.Combine(folderBrowser.SelectedPath, file.FileName + "HDR.TXT"), false)
 									)
 								{
 									writer.WriteLine("Frames:" + bitmaps.Length);
@@ -467,7 +467,7 @@ namespace LBXManager
 								}
 								for (int i = 0; i < bitmaps.Length; i++)
 								{
-									bitmaps[i].Save(Path.Combine(folderBrowser.SelectedPath, file.fileName + i + ".BMP"));
+									bitmaps[i].Save(Path.Combine(folderBrowser.SelectedPath, file.FileName + i + ".BMP"));
 								}
 							}
 						}
